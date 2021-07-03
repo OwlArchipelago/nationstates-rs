@@ -6,12 +6,34 @@ pub struct Region {
     pub name: String,
     pub factbook: String,
     pub numnations: u32,
-    // NATIONS
+    // NATIONS?
     pub delegate: String,
-    // DELEGATE VOTES
+    #[serde(rename = "DELEGATEVOTES")]
+    pub delegate_votes: u32,
     // DELEGATEAUTH
+    pub founder: String,
     // OFFICERS
-    // POWER
+    pub power: String,
     pub flag: String,
-    // EMBASSIES
+    pub embassies: Embassies,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Embassies {
+    #[serde(rename = "$value")]
+    embassies: Vec<Embassy>,
+}
+
+impl Embassies {
+    pub fn get(&self) -> Vec<&Embassy> {
+        self.embassies.iter().filter(|e| e.t.is_none()).collect()
+    }
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Embassy {
+    #[serde(rename = "type")]
+    pub t: Option<String>,
+    #[serde(rename = "$value")]
+    pub region: String,
 }

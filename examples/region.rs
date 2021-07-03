@@ -7,6 +7,11 @@ pub async fn main() -> Result<(), ()> {
 
     println!("{}", region.name);
     println!("{}", region.delegate);
+    println!("{}", region.factbook);
+
+    for embassy in region.embassies.get() {
+        println!("{}", embassy.region);
+    }
 
     Ok(())
 }
