@@ -3,9 +3,9 @@ use nationstates::{NSClient, NSError};
 #[tokio::main]
 pub async fn main() -> Result<(), NSError> {
     let client = NSClient::new("Owl Archipelago's API Test")?;
-    let region = client.get_region("Owl Archipelago").await?;
+    let nation = client.get_nation("Owl Archipelago").await?;
 
-    println!("{}", region.name);
+    println!("{}", nation.name);
     println!("{}", nation.fullname);
     println!("{}", nation.motto);
 
@@ -13,11 +13,20 @@ pub async fn main() -> Result<(), NSError> {
         println!("WA Member");
     }
 
-    if !nation.endorsements.is_empty() {
-        println!("Endorsements: ");
-        for endorsement in nation.endorsements {
-            println!("{}", endorsement);
-        }
+    println!("{} - {}", nation.founded, nation.firstlogin.to_string());
+
+    println!();
+    println!("Economic Freedom: {}", nation.freedom.economy);
+    println!();
+
+    for cause in nation.deaths.causes {
+        println!("{} - {}", cause.reason, cause.percentage);
+    }
+
+    println!();
+    println!("Endo Count: {}", nation.endorsements.count());
+    for endo in nation.endorsements.get() {
+        println!("{}", endo);
     }
 
     Ok(())
