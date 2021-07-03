@@ -11,6 +11,7 @@ pub struct Nation {
     pub fullname: String,
     pub motto: String,
     pub category: String,
+    pub influence: String,
     pub unstatus: WAStatus,
     pub endorsements: Endorsements,
     pub issues_answered: u32,
@@ -24,27 +25,25 @@ pub struct Nation {
     pub currency: String,
     // DEMONYMS
     pub flag: String,
-
     // Industry/Gov stuff
     #[serde(rename = "MAJORINDUSTRY")]
     pub major_industry: String,
     #[serde(rename = "GOVTPRIORITY")]
     pub govt_priority: String,
-
+    #[serde(rename = "PUBLICSECTOR")]
+    pub public_sector: f32,
     pub founded: String,
     #[serde(with = "ts_seconds")]
     pub firstlogin: DateTime<Utc>,
     #[serde(with = "ts_seconds")]
     pub lastlogin: DateTime<Utc>,
-
+    pub lastactivity: String,
     pub deaths: Deaths,
     pub leader: String,
     pub capital: String,
     pub religion: String,
-
     pub factbooks: u32,
     pub dispatches: u32,
-
     pub dbid: u32,
 }
 
