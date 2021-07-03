@@ -23,9 +23,16 @@ pub struct Nation {
     pub tax: f32,
     pub animal: String,
     pub currency: String,
-    // DEMONYMS
+    #[serde(rename = "DEMONYM")]
+    pub adjective_demonym: String,
+    #[serde(rename = "DEMONYM2")]
+    pub noun_demonym: String,
+    #[serde(rename = "DEMONYM2PLURAL")]
+    pub plural_demonym: String,
     pub flag: String,
     // Industry/Gov stuff
+    #[serde(rename = "GOVT")]
+    pub govt_budget: GovtBudget,
     #[serde(rename = "MAJORINDUSTRY")]
     pub major_industry: String,
     #[serde(rename = "GOVTPRIORITY")]
@@ -51,6 +58,27 @@ impl Nation {
     pub fn in_wa(&self) -> bool {
         self.unstatus == WAStatus::Delegate || self.unstatus == WAStatus::NonMember
     }
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub struct GovtBudget {
+    pub administration: f32,
+    pub defence: f32,
+    pub education: f32,
+    pub environment: f32,
+    pub healthcare: f32,
+    pub commerce: f32,
+    #[serde(rename = "INTERNATIONALAID")]
+    pub international_aid: f32,
+    #[serde(rename = "LAWANDORDER")]
+    pub law_and_order: f32,
+    #[serde(rename = "PUBLICTRANSPORT")]
+    pub public_transport: f32,
+    #[serde(rename = "SOCIALEQUALITY")]
+    pub social_equality: f32,
+    pub spirituality: f32,
+    pub welfare: f32,
 }
 
 #[derive(Debug, Deserialize)]

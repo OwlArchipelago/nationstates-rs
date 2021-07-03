@@ -1,9 +1,9 @@
-mod client;
-mod errors;
-mod nation;
-mod region;
+pub mod client;
+pub mod errors;
+pub mod nation;
+pub mod region;
 
 pub use client::NSClient;
 pub use errors::NSError;
-pub use nation::{Freedom, Nation, WAStatus};
+pub use nation::Nation;
 pub use region::Region;
