@@ -1,11 +1,11 @@
-use nationstates::NSAPIClient;
+use nationstates::{NSClient, NSError};
 
 #[tokio::main]
-pub async fn main() -> Result<(), ()> {
-    let client = NSAPIClient::new("Owl Archipelago's API Test").unwrap();
-    let nation = client.get_nation("Owl Archipelago").await.unwrap();
+pub async fn main() -> Result<(), NSError> {
+    let client = NSClient::new("Owl Archipelago's API Test")?;
+    let region = client.get_region("Owl Archipelago").await?;
 
-    println!("{}", nation.ntype);
+    println!("{}", region.name);
     println!("{}", nation.fullname);
     println!("{}", nation.motto);
 
@@ -19,7 +19,6 @@ pub async fn main() -> Result<(), ()> {
             println!("{}", endorsement);
         }
     }
-
 
     Ok(())
 }
