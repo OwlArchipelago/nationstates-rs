@@ -1,6 +1,6 @@
-use serde::Deserialize;
-use chrono::{DateTime, Utc};
 use chrono::serde::ts_seconds;
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
