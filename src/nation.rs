@@ -2,6 +2,7 @@ use chrono::serde::ts_seconds;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
+/// Nation information returned by the Standard Nation API
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Nation {
@@ -100,12 +101,14 @@ impl Endorsements {
     }
 }
 
+/// Causes of death in a nation
 #[derive(Debug, Deserialize)]
 pub struct Deaths {
     #[serde(rename = "CAUSE")]
     pub causes: Vec<Cause>,
 }
 
+/// Cause of death and its percentage
 #[derive(Debug, Deserialize)]
 pub struct Cause {
     #[serde(rename = "type")]
@@ -114,6 +117,7 @@ pub struct Cause {
     pub percentage: f32,
 }
 
+/// Freedom scores for a nation
 #[derive(Debug, Deserialize)]
 pub struct Freedom<T> {
     #[serde(rename = "CIVILRIGHTS")]
@@ -124,6 +128,7 @@ pub struct Freedom<T> {
     pub political: T,
 }
 
+/// WA membership status for a nation
 #[derive(Debug, PartialEq)]
 pub enum WAStatus {
     Delegate,
