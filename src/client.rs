@@ -1,3 +1,4 @@
+use std::str;
 use std::thread::sleep;
 use std::time::{Duration, SystemTime};
 
@@ -87,14 +88,41 @@ impl NSClient {
     }
 
     pub async fn verify(&mut self, nation: &str, checksum: &str) -> Result<bool, NSError> {
+        self.handle_verification(nation, checksum, Option::None)
+            .await
+    }
+
+    pub async fn verify_with_token(
+        &mut self,
+        nation: &str,
+        checksum: &str,
+        token: &str,
+    ) -> Result<bool, NSError> {
+        self.handle_verification(nation, checksum, Option::Some(token))
+            .await
+    }
+
+    async fn handle_verification(
+        &mut self,
+        nation: &str,
+        checksum: &str,
+        token: Option<&str>,
+    ) -> Result<bool, NSError> {
         while !self.make_call() {
             sleep(Duration::from_secs(5));
         }
 
-        let res = self
-            .client
-            .get(NS_API_URL)
-            .query(&[("a", "verify"), ("nation", nation), ("checksum", checksum)])
+        let mut req = self.client.get(NS_API_URL).query(&[
+            ("a", "verify"),
+            ("nation", nation),
+            ("checksum", checksum),
+        ]);
+
+        if let Some(site_token) = token {
+            req = req.query(&[("token", site_token)]);
+        }
+
+        let res = req
             .send()
             .await
             .map_err(|error| NSError::HTTPClient(error))?;
@@ -105,6 +133,6 @@ impl NSClient {
             .await
             .map_err(|error| NSError::HTTPClient(error))?;
 
-        Ok(data == "1")
+        Ok(data.contains("1"))
     }
 }

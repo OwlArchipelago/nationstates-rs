@@ -2,7 +2,7 @@ use nationstates::{NSClient, NSError};
 
 #[tokio::main]
 pub async fn main() -> Result<(), NSError> {
-    let client = NSClient::new("Owl Archipelago's API Test")?;
+    let mut client = NSClient::new("Owl Archipelago's API Test")?;
     let nation = client.get_nation("Owl Archipelago").await?;
 
     println!("{}", nation.name);
