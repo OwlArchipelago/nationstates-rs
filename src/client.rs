@@ -43,7 +43,7 @@ impl NSClient {
             return true;
         }
 
-        return false;
+        false
     }
 
     pub async fn get_nation(&mut self, nation: &str) -> Result<Nation, NSError> {
@@ -57,14 +57,11 @@ impl NSClient {
             .query(&[("nation", nation), ("v", NS_API_VERSION)])
             .send()
             .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+            .map_err(NSError::HTTPClient)?;
         // Get text from the response or return an error
-        let data = res
-            .text()
-            .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+        let data = res.text().await.map_err(NSError::HTTPClient)?;
         // Deserialization
-        from_str(data.as_str()).map_err(|error| NSError::Deserializer(error))
+        from_str(data.as_str()).map_err(NSError::Deserializer)
     }
 
     pub async fn get_region(&mut self, region: &str) -> Result<Region, NSError> {
@@ -78,14 +75,11 @@ impl NSClient {
             .query(&[("region", region), ("v", NS_API_VERSION)])
             .send()
             .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+            .map_err(NSError::HTTPClient)?;
         // Get text from the response or return an error
-        let data = res
-            .text()
-            .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+        let data = res.text().await.map_err(NSError::HTTPClient)?;
         // Deserialization
-        from_str(data.as_str()).map_err(|error| NSError::Deserializer(error))
+        from_str(data.as_str()).map_err(NSError::Deserializer)
     }
 
     pub async fn verify(&mut self, nation: &str, checksum: &str) -> Result<bool, NSError> {
@@ -124,17 +118,11 @@ impl NSClient {
             req = req.query(&[("token", site_token)]);
         }
 
-        let res = req
-            .send()
-            .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+        let res = req.send().await.map_err(NSError::HTTPClient)?;
 
         // Get text from the response or return an error
-        let data = res
-            .text()
-            .await
-            .map_err(|error| NSError::HTTPClient(error))?;
+        let data = res.text().await.map_err(NSError::HTTPClient)?;
 
-        Ok(data.contains("1"))
+        Ok(data.contains('1'))
     }
 }
