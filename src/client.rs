@@ -11,6 +11,7 @@ use crate::region::Region;
 
 const NS_API_URL: &str = "https://www.nationstates.net/cgi-bin/api.cgi";
 const RATE_LIMIT: usize = 49;
+const NS_API_VERSION: &str = "11";
 
 pub struct NSClient {
     client: Client,
@@ -53,7 +54,7 @@ impl NSClient {
         let res = self
             .client
             .get(NS_API_URL)
-            .query(&[("nation", nation)])
+            .query(&[("nation", nation), ("v", NS_API_VERSION)])
             .send()
             .await
             .map_err(|error| NSError::HTTPClient(error))?;
@@ -74,7 +75,7 @@ impl NSClient {
         let res = self
             .client
             .get(NS_API_URL)
-            .query(&[("region", region)])
+            .query(&[("region", region), ("v", NS_API_VERSION)])
             .send()
             .await
             .map_err(|error| NSError::HTTPClient(error))?;
@@ -116,6 +117,7 @@ impl NSClient {
             ("a", "verify"),
             ("nation", nation),
             ("checksum", checksum),
+            ("v", NS_API_VERSION),
         ]);
 
         if let Some(site_token) = token {

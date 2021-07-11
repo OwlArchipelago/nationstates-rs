@@ -6,7 +6,7 @@ pub struct Region {
     pub name: String,
     pub factbook: String,
     pub numnations: u32,
-    // NATIONS?
+    // TODO NATIONS
     pub delegate: String,
     #[serde(rename = "DELEGATEVOTES")]
     pub delegate_votes: u32,
