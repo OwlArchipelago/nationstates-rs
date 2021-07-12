@@ -97,7 +97,11 @@ impl Endorsements {
     }
 
     pub fn get(&self) -> Vec<String> {
-        self.endos.as_ref().unwrap_or(vec![].as_ref()).clone()
+        let empty = vec![];
+        self.endos
+            .as_ref()
+            .unwrap_or_else(|| empty.as_ref())
+            .clone()
     }
 }
 

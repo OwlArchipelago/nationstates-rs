@@ -20,15 +20,15 @@ pub struct NSClient {
 
 impl NSClient {
     pub fn new(user_agent: &str) -> Result<NSClient, NSError> {
-        let client = Client::builder().user_agent(user_agent).build();
+        let client = Client::builder()
+            .user_agent(user_agent)
+            .build()
+            .map_err(NSError::HTTPClient)?;
 
-        match client {
-            Ok(client) => Ok(NSClient {
-                client,
-                calls: vec![],
-            }),
-            Err(error) => Err(NSError::HTTPClient(error)),
-        }
+        Ok(NSClient {
+            client,
+            calls: vec![],
+        })
     }
 
     fn make_call(&mut self) -> bool {
@@ -46,45 +46,40 @@ impl NSClient {
         false
     }
 
-    pub async fn get_nation(&mut self, nation: &str) -> Result<Nation, NSError> {
+    async fn make_request(&mut self, query: &[(&str, &str)]) -> Result<String, NSError> {
         while !self.make_call() {
             sleep(Duration::from_secs(5));
         }
 
-        let res = self
-            .client
+        self.client
             .get(NS_API_URL)
-            .query(&[("nation", nation), ("v", NS_API_VERSION)])
+            .query(&[("v", NS_API_VERSION)])
+            .query(query)
             .send()
             .await
-            .map_err(NSError::HTTPClient)?;
-        // Get text from the response or return an error
-        let data = res.text().await.map_err(NSError::HTTPClient)?;
-        // Deserialization
+            .map_err(NSError::HTTPClient)?
+            .text()
+            .await
+            .map_err(NSError::HTTPClient)
+    }
+
+    pub async fn get_nation(&mut self, nation: &str) -> Result<Nation, NSError> {
+        let data = self.make_request(&[("nation", nation)]).await?;
+        // Parse the xml
         from_str(data.as_str()).map_err(NSError::Deserializer)
     }
 
     pub async fn get_region(&mut self, region: &str) -> Result<Region, NSError> {
-        while !self.make_call() {
-            sleep(Duration::from_secs(5));
-        }
-
-        let res = self
-            .client
-            .get(NS_API_URL)
-            .query(&[("region", region), ("v", NS_API_VERSION)])
-            .send()
-            .await
-            .map_err(NSError::HTTPClient)?;
-        // Get text from the response or return an error
-        let data = res.text().await.map_err(NSError::HTTPClient)?;
-        // Deserialization
+        let data = self.make_request(&[("region", region)]).await?;
+        // Parse the xml
         from_str(data.as_str()).map_err(NSError::Deserializer)
     }
 
     pub async fn verify(&mut self, nation: &str, checksum: &str) -> Result<bool, NSError> {
-        self.handle_verification(nation, checksum, Option::None)
-            .await
+        let data = self
+            .make_request(&[("a", "verify"), ("nation", nation), ("checksum", checksum)])
+            .await?;
+        Ok(data.contains('1'))
     }
 
     pub async fn verify_with_token(
@@ -93,36 +88,14 @@ impl NSClient {
         checksum: &str,
         token: &str,
     ) -> Result<bool, NSError> {
-        self.handle_verification(nation, checksum, Option::Some(token))
-            .await
-    }
-
-    async fn handle_verification(
-        &mut self,
-        nation: &str,
-        checksum: &str,
-        token: Option<&str>,
-    ) -> Result<bool, NSError> {
-        while !self.make_call() {
-            sleep(Duration::from_secs(5));
-        }
-
-        let mut req = self.client.get(NS_API_URL).query(&[
-            ("a", "verify"),
-            ("nation", nation),
-            ("checksum", checksum),
-            ("v", NS_API_VERSION),
-        ]);
-
-        if let Some(site_token) = token {
-            req = req.query(&[("token", site_token)]);
-        }
-
-        let res = req.send().await.map_err(NSError::HTTPClient)?;
-
-        // Get text from the response or return an error
-        let data = res.text().await.map_err(NSError::HTTPClient)?;
-
+        let data = self
+            .make_request(&[
+                ("a", "verify"),
+                ("token", token),
+                ("nation", nation),
+                ("checksum", checksum),
+            ])
+            .await?;
         Ok(data.contains('1'))
     }
 }
