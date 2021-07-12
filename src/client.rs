@@ -1,5 +1,4 @@
 use std::str;
-use std::thread::sleep;
 use std::time::{Duration, SystemTime};
 
 use quick_xml::de::from_str;
@@ -48,7 +47,7 @@ impl NSClient {
 
     async fn make_request(&mut self, query: &[(&str, &str)]) -> Result<String, NSError> {
         while !self.make_call() {
-            sleep(Duration::from_secs(5));
+            tokio::time::sleep(Duration::from_secs(5)).await;
         }
 
         self.client
