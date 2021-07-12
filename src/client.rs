@@ -47,7 +47,12 @@ impl NSClient {
 
     async fn make_request(&mut self, query: &[(&str, &str)]) -> Result<String, NSError> {
         while !self.make_call() {
-            tokio::time::sleep(Duration::from_secs(5)).await;
+            let first_call = self.calls.get(0).unwrap();
+            let duration = match first_call.elapsed() {
+                Ok(elapsed) => Duration::from_secs(30) - elapsed,
+                Err(_) => Duration::from_secs(5),
+            };
+            tokio::time::sleep(duration).await;
         }
 
         self.client
